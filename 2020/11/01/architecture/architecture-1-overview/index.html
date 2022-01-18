@@ -1,0 +1,249 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>架构指什么? | 锋哥博客</title><meta name="keywords" content="Architecture"><meta name="author" content="锋哥"><meta name="copyright" content="锋哥"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="架构???对于技术人员来讲，“架构”是经常挂在嘴边的，那么架构到底指的是什么呢？框架和架构之间又有什么差异？ 想要比较准确的回答“架构是什么？”，需要从以下几个方面说起：  系统与子系统 模块与组件 架构与框架  系统与子系统维基百科的解释： 系统 :   泛指由一群有关联的个体组成，根据某种规则运作，能完成个别元件不能单独完成的工作的群体。   关联 : 系统是有一群有关联的个体组成的,没有关联">
+<meta property="og:type" content="article">
+<meta property="og:title" content="架构指什么?">
+<meta property="og:url" content="https://zhweif.github.io/2020/11/01/architecture/architecture-1-overview/index.html">
+<meta property="og:site_name" content="锋哥博客">
+<meta property="og:description" content="架构???对于技术人员来讲，“架构”是经常挂在嘴边的，那么架构到底指的是什么呢？框架和架构之间又有什么差异？ 想要比较准确的回答“架构是什么？”，需要从以下几个方面说起：  系统与子系统 模块与组件 架构与框架  系统与子系统维基百科的解释： 系统 :   泛指由一群有关联的个体组成，根据某种规则运作，能完成个别元件不能单独完成的工作的群体。   关联 : 系统是有一群有关联的个体组成的,没有关联">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg">
+<meta property="article:published_time" content="2020-11-01T01:15:41.000Z">
+<meta property="article:modified_time" content="2020-11-01T01:15:41.000Z">
+<meta property="article:author" content="锋哥">
+<meta property="article:tag" content="Architecture">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://zhweif.github.io/2020/11/01/architecture/architecture-1-overview/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: 锋哥","link":"链接: ","source":"来源: 锋哥博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '架构指什么?',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-11-01 09:15:41'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const fontSizeVal = saveToLocal.get('global-font-size')
+    if (fontSizeVal !== undefined) {
+      document.documentElement.style.setProperty('--global-font-size', fontSizeVal + 'px')
+    }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-heartbeat"></i><span> 娱乐</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://gitee.com/zhangweif/blog-img/raw/main/architecture/1-overview/top-cover.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">锋哥博客</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-heartbeat"></i><span> 娱乐</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">架构指什么?</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-11-01T01:15:41.000Z" title="发表于 2020-11-01 09:15:41">2020-11-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-11-01T01:15:41.000Z" title="更新于 2020-11-01 09:15:41">2020-11-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Architecture/">Architecture</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="架构指什么?"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="架构"><a href="#架构" class="headerlink" title="架构???"></a>架构???</h1><p>对于技术人员来讲，“架构”是经常挂在嘴边的，那么架构到底指的是什么呢？框架和架构之间又有什么差异？</p>
+<p>想要比较准确的回答“架构是什么？”，需要从以下几个方面说起：</p>
+<ul>
+<li>系统与子系统</li>
+<li>模块与组件</li>
+<li>架构与框架</li>
+</ul>
+<h1 id="系统与子系统"><a href="#系统与子系统" class="headerlink" title="系统与子系统"></a>系统与子系统</h1><p>维基百科的解释：</p>
+<p><strong>系统</strong> : </p>
+<blockquote>
+<p>泛指由一群有<strong>关联</strong>的个体组成，根据某种<strong>规则</strong>运作，能完成个别元件不能单独完成的工作的群体。</p>
+</blockquote>
+<ol>
+<li><strong>关联</strong> : 系统是有一群有关联的个体组成的,没有关联的个体放在一起不能构成一个系统.例如:轮胎和键盘放在一起不能构成一个系统;键盘,CPU,磁盘,显示器等等放在一起就可以构成一个计算机</li>
+<li><strong>规则</strong> : 系统内部的每个个体须按照某种规则运行,而不能各自为政.规则制定了每个个体的职责.例如:键盘就是用来输入的,显示器是用来输出的.</li>
+<li><strong>能力</strong> : 每个个体有自己的能力,但是组成的系统所拥有的能力不是个体能力的总和,而是新的能力.例如:键盘可以打字,显示器可以输入,磁盘可以存数据,但是计算机的能力并不是组成个体所拥有的</li>
+</ol>
+<p><strong>子系统</strong> :</p>
+<blockquote>
+<p>也是由一群有关联的个体所组成的系统，多半会是更大系统中的一部分。</p>
+</blockquote>
+<p>子系统和系统的概念几乎是一样的,只是子系统包含在系统里面.例如:</p>
+<ol>
+<li>微信是一个系统,它的子系统有:朋友圈,视频号,直播,小程序,订阅号等等</li>
+<li>盆友圈这个子系统又包含评论,点赞,动态等子系统</li>
+<li>评论子系统又包含审核,发布,存储等子系统</li>
+</ol>
+<h1 id="模块与组件"><a href="#模块与组件" class="headerlink" title="模块与组件"></a>模块与组件</h1><p>这两个概念经常被混淆,维基百科定义:</p>
+<h3 id="模块"><a href="#模块" class="headerlink" title="模块:"></a>模块:</h3><blockquote>
+<p>是一套一致而互相有紧密关连的软件组织。包含了程序和数据结构两个部分。<br>软件模块是现代软件开发往往利用模块作合成的单位。<br>模块的接口表达了由该模块提供的功能和调用它时所需的元素。<br>模块是可能分开地被编写的单位，能允许广泛人员同时协作、编写及研究不同的模块。</p>
+</blockquote>
+<h3 id="组件"><a href="#组件" class="headerlink" title="组件:"></a>组件:</h3><blockquote>
+<p>定义为自包含的、可编程的、可重用的、与语言无关的软件单元。</p>
+</blockquote>
+<p>如果只看定义, 看不出两者的差别在哪里. 原因是 : <strong>模块和组件都是系统的组成部分, 只是从不同的角度进行了拆分</strong></p>
+<p>从<strong>逻辑</strong>角度拆分, 所得到的就是<strong>模块</strong>; 从<strong>物理</strong>角度拆分, 得到的就是<strong>组件</strong>.<br>划分<strong>模块</strong>的主要目的是<strong>职责分离</strong>, 划分<strong>组件</strong>的主要目的是<strong>单元复用</strong>.</p>
+<p>以一个博客网站为例, 从<strong>逻辑</strong>角度可以拆分为: 文章模块, 评论模块, 用户模块; 从<strong>物理</strong>角度可以拆分为: MySQL, Nginx, Web服务器</p>
+<h1 id="架构与框架"><a href="#架构与框架" class="headerlink" title="架构与框架"></a>架构与框架</h1><h3 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h3><p>维基百科定义:</p>
+<blockquote>
+<p>软件框架（software framework），通常指的是为了实现某个业界标准或完成特定基本任务的软件组件规范，也指为了实现某个软件组件规范时，提供规范所要求之基础功能的软件产品。</p>
+</blockquote>
+<ol>
+<li>框架是组件规范: 例如: MVC, MVVM, J2EE等框架</li>
+<li>框架是提供基础功能的软件产品: 例如: SpringMVC, Spring, Spring JPA 等</li>
+</ol>
+<h3 id="架构-1"><a href="#架构-1" class="headerlink" title="架构"></a>架构</h3><p>维基百科定义:</p>
+<blockquote>
+<p>软件架构是有关软件整体结构与组件的抽象描述，用于指导大型软件系统各个方面的设计。</p>
+</blockquote>
+<p>从定义来看, 框架更关心<strong>规范</strong>, 架构关注的是<strong>整体结构,设计</strong>.</p>
+<p>但是, 工作中却又很多说法, 例如: “这个系统是MVC架构的”, “基于SSM框架的”等等. 这是因为从不同的角度或者维度, 可以将系统划分为不同的结构.</p>
+<p>软件架构4+1视图模型: 从不同维度将系统分为不同的结构</p>
+<ul>
+<li>逻辑视图(Logical View): 设计的对象模型(使用面向对象的设计方法时)</li>
+<li>过程视图(Process View): 捕捉设计的并发和同步特征</li>
+<li>物理视图(Physical View): 描述了软件到硬件的映射，反映了分布式特性</li>
+<li>开发视图(Development View): 描述了在开发环境中软件的静态组织结构</li>
+<li>场景视图</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>结合维基百科的定义, 可以将架构定义为: <strong>软件架构指系统的顶层结构</strong></p>
+<p><strong>系统</strong>由一群关联的个体组成, 这些个体可以是 “子系统”, “组件”, “模块” 等, 系统要明确个体以及个体的运行规则, <strong>架构</strong>则是系统的顶层设计机构.</p>
+<blockquote>
+<p><strong>架构</strong>是顶层设计; <strong>框架</strong>是面向编程或者配置的规范或者产品; <strong>组件</strong>是技术维度上的复用; <strong>模块</strong>是业务维度上的职责划分; <strong>系统</strong>是相互协调可运行的实体</p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Architecture/">Architecture</a></div><div class="post_share"><div class="social-share" data-image="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/11/02/architecture/architecture-2-perpose/"><img class="prev-cover" src="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">架构设计的意义</div></div></a></div><div class="next-post pull-right"><a href="/2020/10/03/mysql/MySQL-3-transaction/"><img class="next-cover" src="https://gitee.com/zhangweif/blog-img/raw/main/mysql/mysql-overview/top-cover.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">MySQL-3 MySQL事务</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2020/11/02/architecture/architecture-2-perpose/" title="架构设计的意义"><img class="cover" src="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-11-02</div><div class="title">架构设计的意义</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">锋哥</div><div class="author-info__description">个人博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhweif"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">架构???</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E4%B8%8E%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="toc-number">2.</span> <span class="toc-text">系统与子系统</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E4%B8%8E%E7%BB%84%E4%BB%B6"><span class="toc-number">3.</span> <span class="toc-text">模块与组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97"><span class="toc-number">3.0.1.</span> <span class="toc-text">模块:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%84%E4%BB%B6"><span class="toc-number">3.0.2.</span> <span class="toc-text">组件:</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-number">4.</span> <span class="toc-text">架构与框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%86%E6%9E%B6"><span class="toc-number">4.0.1.</span> <span class="toc-text">框架</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84-1"><span class="toc-number">4.0.2.</span> <span class="toc-text">架构</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/12/16/spring/spring-1-overview/" title="Spring-1 Spring Framework 组成模块"><img src="https://gitee.com/zhangweif/blog-img/raw/main/img-repo/star-river.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Spring-1 Spring Framework 组成模块"/></a><div class="content"><a class="title" href="/2021/12/16/spring/spring-1-overview/" title="Spring-1 Spring Framework 组成模块">Spring-1 Spring Framework 组成模块</a><time datetime="2021-12-16T08:44:11.000Z" title="发表于 2021-12-16 16:44:11">2021-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/02/architecture/architecture-2-perpose/" title="架构设计的意义"><img src="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="架构设计的意义"/></a><div class="content"><a class="title" href="/2020/11/02/architecture/architecture-2-perpose/" title="架构设计的意义">架构设计的意义</a><time datetime="2020-11-02T12:15:41.000Z" title="发表于 2020-11-02 20:15:41">2020-11-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/01/architecture/architecture-1-overview/" title="架构指什么?"><img src="https://gitee.com/zhangweif/blog-img/raw/main/architecture/cover.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="架构指什么?"/></a><div class="content"><a class="title" href="/2020/11/01/architecture/architecture-1-overview/" title="架构指什么?">架构指什么?</a><time datetime="2020-11-01T01:15:41.000Z" title="发表于 2020-11-01 09:15:41">2020-11-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/10/03/mysql/MySQL-3-transaction/" title="MySQL-3 MySQL事务"><img src="https://gitee.com/zhangweif/blog-img/raw/main/mysql/mysql-overview/top-cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MySQL-3 MySQL事务"/></a><div class="content"><a class="title" href="/2020/10/03/mysql/MySQL-3-transaction/" title="MySQL-3 MySQL事务">MySQL-3 MySQL事务</a><time datetime="2020-10-03T07:15:41.000Z" title="发表于 2020-10-03 15:15:41">2020-10-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/10/02/mysql/MySQL-2-data-structure/" title="MySQL-2 MySQL索引数据结构"><img src="https://gitee.com/zhangweif/blog-img/raw/main/mysql/mysql-overview/top-cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MySQL-2 MySQL索引数据结构"/></a><div class="content"><a class="title" href="/2020/10/02/mysql/MySQL-2-data-structure/" title="MySQL-2 MySQL索引数据结构">MySQL-2 MySQL索引数据结构</a><time datetime="2020-10-02T05:15:41.000Z" title="发表于 2020-10-02 13:15:41">2020-10-02</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://gitee.com/zhangweif/blog-img/raw/main/architecture/1-overview/top-cover.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By 锋哥</div><div class="footer_custom_text"><a target="_blank" href="https://beian.miit.gov.cn/">陇ICP备2021002744号-1</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font-plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font-minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
