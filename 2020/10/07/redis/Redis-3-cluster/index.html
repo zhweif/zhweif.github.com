@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Redis 高可用集群 | 锋哥博客</title><meta name="keywords" content="Redis"><meta name="author" content="锋哥"><meta name="copyright" content="锋哥"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Redis集群方案哨兵 哨兵模式性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在访问瞬断的情况，而且哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率 高可用集群 官方集群搭建文档官方集群规范 redis集群是一个由多个主从节点群组成的分布式服务器群，它具有复制、高可用和分片特性。Redis集群">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 高可用集群">
+<meta property="og:url" content="https://zhweif.github.io/2020/10/07/redis/Redis-3-cluster/index.html">
+<meta property="og:site_name" content="锋哥博客">
+<meta property="og:description" content="Redis集群方案哨兵 哨兵模式性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在访问瞬断的情况，而且哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率 高可用集群 官方集群搭建文档官方集群规范 redis集群是一个由多个主从节点群组成的分布式服务器群，它具有复制、高可用和分片特性。Redis集群">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img.zhwf.top/redis/redis-icon.jpg">
+<meta property="article:published_time" content="2020-10-07T12:15:41.000Z">
+<meta property="article:modified_time" content="2020-10-07T12:15:41.000Z">
+<meta property="article:author" content="锋哥">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.zhwf.top/redis/redis-icon.jpg"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://zhweif.github.io/2020/10/07/redis/Redis-3-cluster/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: 锋哥","link":"链接: ","source":"来源: 锋哥博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Redis 高可用集群',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-10-07 20:15:41'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-heartbeat"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://img.zhwf.top/redis/redis.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">锋哥博客</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-heartbeat"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Redis 高可用集群</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-10-07T12:15:41.000Z" title="发表于 2020-10-07 20:15:41">2020-10-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-10-07T12:15:41.000Z" title="更新于 2020-10-07 20:15:41">2020-10-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Redis/">Redis</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Redis 高可用集群"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Redis集群方案"><a href="#Redis集群方案" class="headerlink" title="Redis集群方案"></a>Redis集群方案</h1><h2 id="哨兵"><a href="#哨兵" class="headerlink" title="哨兵"></a>哨兵</h2><p><img src="https://img.zhwf.top/redis/sentinel-model.png"></p>
+<p>哨兵模式性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在访问瞬断的情况，而且哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，<br>且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率</p>
+<h2 id="高可用集群"><a href="#高可用集群" class="headerlink" title="高可用集群"></a>高可用集群</h2><p><img src="https://img.zhwf.top/redis/cluster.png"></p>
+<p><a target="_blank" rel="noopener" href="https://redis.io/topics/cluster-tutorial">官方集群搭建文档</a><br><a target="_blank" rel="noopener" href="https://redis.io/topics/cluster-spec">官方集群规范</a></p>
+<p>redis集群是一个由多个主从节点群组成的分布式服务器群，它具有复制、高可用和分片特性。Redis集群不需要sentinel哨兵·也能完成节点移除和故障转移的功能。<br>需要将每个节点设置成集群模式，这种集群模式没有中心节点，可水平扩展(官方文档:高达 1000 个节点)。<br>redis集群的性能和高可用性均优于之前版本的哨兵模式，且集群配置非常简单</p>
+<h1 id="高可用集群搭建"><a href="#高可用集群搭建" class="headerlink" title="高可用集群搭建"></a>高可用集群搭建</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">第一步：在第一台机器的指定目录下创建文件夹redis-cluster，然后在其下面分别创建2个文件夾如下</span><br><span class="line">（1）mkdir -p redis-cluster</span><br><span class="line">（2）mkdir 8001 8004</span><br><span class="line"></span><br><span class="line">第一步：把之前的redis.conf配置文件copy到8001下，修改如下内容：</span><br><span class="line">（1）daemonize yes</span><br><span class="line">（2）port 8001（分别对每个机器的端口号进行设置）</span><br><span class="line">（3）pidfile /var/run/redis_8001.pid  # 把pid进程号写入pidfile配置的文件</span><br><span class="line">（4）dir /usr/local/redis-cluster/8001/（指定数据文件存放位置，必须要指定不同的目录位置，不然会丢失数据）</span><br><span class="line">（5）cluster-enabled yes（启动集群模式）</span><br><span class="line">（6）cluster-config-file nodes-8001.conf（集群节点信息文件，这里800x最好和port对应上）</span><br><span class="line">（7）cluster-node-timeout 10000</span><br><span class="line"> (8)# bind 127.0.0.1（bind绑定的是自己机器网卡的ip，如果有多块网卡可以配多个ip，代表允许客户端通过机器的哪些网卡ip去访问，内网一般可以不配置bind，注释掉即可）</span><br><span class="line"> (9)protected-mode  no   （关闭保护模式）</span><br><span class="line"> (10)appendonly yes</span><br><span class="line">如果要设置密码需要增加如下配置：</span><br><span class="line"> (11)requirepass zhwf123     (设置redis访问密码)</span><br><span class="line"> (12)masterauth zhwf123      (设置集群节点间访问密码，跟上面一致)</span><br><span class="line"></span><br><span class="line">第三步：把修改后的配置文件，copy到8004，修改第2、3、4、6项里的端口号，可以用批量替换：</span><br><span class="line">:%s/源字符串/目的字符串/g </span><br><span class="line"></span><br><span class="line">第四步：另外两台机器也需要做上面几步操作，第二台机器用8002和8005，第三台机器用8003和8006</span><br><span class="line"></span><br><span class="line">第五步：分别启动6个redis实例，然后检查是否启动成功</span><br><span class="line">（1）/usr/local/redis-5.0.14/src/redis-server /usr/local/redis-cluster/800*/redis.conf</span><br><span class="line">（2）ps -ef | grep redis 查看是否启动成功</span><br><span class="line">    </span><br><span class="line">第六步：用redis-cli创建整个redis集群(redis5以前的版本集群是依靠ruby脚本redis-trib.rb实现)</span><br><span class="line"># 下面命令里的1代表为每个创建的主服务器节点创建一个从服务器节点</span><br><span class="line"># 执行这条命令需要确认三台机器之间的redis实例要能相互访问，可以先简单把所有机器防火墙关掉，如果不关闭防火墙则需要打开redis服务端口和集群节点gossip通信端口16379(默认是在redis端口号上加1W)</span><br><span class="line"># 关闭防火墙</span><br><span class="line"># systemctl stop firewalld # 临时关闭防火墙</span><br><span class="line"># systemctl disable firewalld # 禁止开机启动</span><br><span class="line"># 使用命令创建集群</span><br><span class="line">（1）/usr/local/redis-5.0.14/src/redis-cli -a zhwf123 --cluster create --cluster-replicas 1 192.168.237.131:8001 192.168.237.135:8002 192.168.237.136:8003 192.168.237.131:8004 192.168.237.135:8005 192.168.237.136:8006 </span><br><span class="line"></span><br><span class="line">第七步：验证集群：</span><br><span class="line">（1）连接任意一个客户端即可：./redis-cli -c -h -p (-a访问服务端密码，-c表示集群模式，指定ip地址和端口号）</span><br><span class="line">    如：/usr/local/redis-5.0.14/src/redis-cli -a zhwf123 -c -h 192.168.237.131 -p 8001</span><br><span class="line">（2）进行验证： cluster info（查看集群信息）、cluster nodes（查看节点列表）</span><br><span class="line">（3）进行数据操作验证</span><br><span class="line">（4）关闭集群则需要逐个进行关闭，使用命令：</span><br><span class="line">/usr/local/redis-5.0.14/src/redis-cli -a zhwf123 -c -h 192.168.237.131 -p 8001 shutdown</span><br></pre></td></tr></table></figure>
+
+<h1 id="SpringBoot操作Redis集群"><a href="#SpringBoot操作Redis集群" class="headerlink" title="SpringBoot操作Redis集群"></a>SpringBoot操作Redis集群</h1><p>引入依赖包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.apache.commons&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;commons-pool2&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">database:</span> <span class="number">0</span></span><br><span class="line">    <span class="attr">timeout:</span> <span class="number">3000</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">zhwf123</span></span><br><span class="line">    <span class="attr">cluster:</span></span><br><span class="line">      <span class="attr">nodes:</span> <span class="number">192.168</span><span class="number">.237</span><span class="number">.131</span><span class="string">:8001,192.168.237.135:8002,192.168.237.136:8003,192.168.237.131:8004,192.168.237.135:8005,192.168.237.136:8006</span></span><br><span class="line">    <span class="attr">lettuce:</span></span><br><span class="line">      <span class="attr">pool:</span></span><br><span class="line">        <span class="attr">max-idle:</span> <span class="number">50</span></span><br><span class="line">        <span class="attr">min-idle:</span> <span class="number">10</span></span><br><span class="line">        <span class="attr">max-active:</span> <span class="number">100</span></span><br><span class="line">        <span class="attr">max-wait:</span> <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+
+<p>代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IndexController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(IndexController.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@PostMapping(&quot;/set&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.stringRedisTemplate.opsForValue().set(<span class="string">&quot;zhwf&quot;</span>, <span class="string">&quot;88888888&quot;</span>);</span><br><span class="line">        System.out.println(<span class="keyword">this</span>.stringRedisTemplate.opsForValue().get(<span class="string">&quot;zhwf&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="集群原理"><a href="#集群原理" class="headerlink" title="集群原理"></a>集群原理</h1><p>Redis Cluster 将所有数据划分为 16384 个 slots(槽位)，每个节点负责其中一部分槽位。槽位的信息存储于每个节点中。<br>当 Redis Cluster 的客户端来连接集群时，它也会得到一份集群的槽位配置信息并将其缓存在客户端本地。这样当客户端要查找某个 key 时，可以直接定位到目标节点。<br>同时因为槽位的信息可能会存在客户端与服务器不一致的情况，还需要纠正机制来实现槽位信息的校验调整。</p>
+<h2 id="slots定位"><a href="#slots定位" class="headerlink" title="slots定位"></a>slots定位</h2><p>Cluster 默认会对 key 值使用 crc16 算法进行 hash 得到一个整数值，然后用这个整数值对 16384 进行取模来得到具体槽位。<br>HASH_SLOT = CRC16(key) mod 16384</p>
+<h2 id="跳转重定位"><a href="#跳转重定位" class="headerlink" title="跳转重定位"></a>跳转重定位</h2><p>当客户端发送一个不属于当前节点所属槽位的的命令时, 当前节点对key进行计算得到相应的槽位发现该槽位不属于自己管理范围, 就会对客户端发送一个跳转指令并携带目标节点的地址,<br>客户端在收到跳转指令时就会在正确的节点上去执行命令并同时更新本地的槽位映射信息.</p>
+<p><img src="https://img.zhwf.top/redis/redis-cluster-redirect.jpg"></p>
+<h2 id="Redis集群节点之间的通讯"><a href="#Redis集群节点之间的通讯" class="headerlink" title="Redis集群节点之间的通讯"></a>Redis集群节点之间的通讯</h2><p>redis cluster节点间采取gossip协议进行通信</p>
+<p>维护集群的元数据(集群节点信息，主从角色，节点数量，各节点共享的数据等)有两种方式：集中式和gossip</p>
+<h3 id="集中式"><a href="#集中式" class="headerlink" title="集中式"></a>集中式</h3><p>优点 : 于元数据的更新和读取，时效性非常好，一旦元数据出现变更立即就会更新到集中式的存储中，其他节点读取的时候立即就可以立即感知到；<br>不足 : 所有的元数据的更新压力全部集中在一个地方，可能导致元数据的存储压力。</p>
+<p>很多中间件都会借助zookeeper集中式存储元数据。</p>
+<h3 id="gossip"><a href="#gossip" class="headerlink" title="gossip"></a>gossip</h3><p><img src="https://img.zhwf.top/redis/gossip.gif"></p>
+<p>gossip协议包含多种消息，包括ping，pong，meet，fail等等。</p>
+<ul>
+<li>meet : 某个节点发送meet给新加入的节点，让新节点加入集群中，然后新节点就会开始与其他节点进行通信；</li>
+<li>ping : 每个节点都会频繁给其他节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过ping交换元数据(类似自己感知到的集群节点增加和移除，hash slot信息等)；</li>
+<li>pong : 对ping和meet消息的返回，包含自己的状态和其他信息，也可以用于信息广播和更新；</li>
+<li>fail : 某个节点判断另一个节点fail之后，就发送fail给其他节点，通知其他节点，指定的节点宕机了。</li>
+</ul>
+<h2 id="网络抖动"><a href="#网络抖动" class="headerlink" title="网络抖动"></a>网络抖动</h2><p>在实际环境中可能存在网络不稳定, 节点之间可能在某个时刻突然连接不可用, 然后马上又恢复正常. Redis Cluster 有一个配置选项:<br><strong>cluster-node-timeout</strong> <milliseconds> : 只有超过了指定的超时时间, 才认为这个节点不可用,<br>如果这个timeout配置的值太小, 可能会造成因为网络抖动而频繁切换主从角色(同时伴随着数据的复制), 比较影响性能</p>
+<h2 id="Redis集群选举"><a href="#Redis集群选举" class="headerlink" title="Redis集群选举"></a>Redis集群选举</h2><p>当slaver发现自己的maser变为fail状态之后,就会进行failover,希望自己成为新的master. 该master可能存在多个slaver,多个slaver都想成为master,它之间就存在竞争</p>
+<ol>
+<li>slaver发现自己的master变为fail</li>
+<li>将自己记录的集群currentEpoch加1, 并广播FAILOVER_AUTH_REQUEST信息</li>
+<li>其他节点收到该信息,直邮master会响应, 当判断请求信息合法之后, 发送FAILOVER_AUTH_ACK,对每个epoch只发送一个ack</li>
+<li>尝试failover的salver收集其他节点的master返回的ack</li>
+<li>当slaver收到超过半数master的ack之后就会变为新的master</li>
+<li>slaver广播Pong消息通知其他节点</li>
+</ol>
+<p>slaver在master变为fail之后, 并不是马上就进行failover, 而是存在一定的延迟; 延迟保证了master的fail状态能够通知到集群里面的其他节点,如果在master变为fail之后就马上进行failover的话, 有可能其他节点还没有收到该master已经fail,就会拒绝投票</p>
+<ul>
+<li>延迟计算<br>DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms</li>
+</ul>
+<p>SLAVE_RANK 表示此slave已经从master复制数据的总量的rank。Rank越小代表已复制的数据越新。这种方式下，持有最新数据的slave将会首先发起选举（理论上）</p>
+<h2 id="集群脑裂数据丢失问题"><a href="#集群脑裂数据丢失问题" class="headerlink" title="集群脑裂数据丢失问题"></a>集群脑裂数据丢失问题</h2><p><strong>集群的脑裂问题</strong>: 由于master和slaver处于不同的网络分区, 使得slaver没有及时感知到master的心跳以为master处于不可用状态,<br>此时slaver发起了failover升级成为了新的master, 而原来旧的master也是可用的, 导致两个master同时在写数据, 当网络恢复之后旧的master变为新master的slaver从新的master同步数据过去, 那么旧的master写进去的数据就会丢失.</p>
+<p><strong>解决方法</strong>: 在redis配置里面修改参数:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">min-replicas-to-write 1 // 写数据成功最少同步的slave数量，这个数量可以模仿大于半数机制配置，比如集群总共三个节点可以配置1，加上leader就是2，超过了半数</span><br><span class="line">min-replicas-max-lag 10  // slaver连接到master的最大延迟时间, 当延迟超时是master就会拒绝写</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意: 配置 min-replicas-to-write 在一定程度上会影响集群的可用性, 比如slaver少于1个, 就算是master正常也不能提供服务, 需要根据集体情况权衡利弊</p>
+</blockquote>
+<h1 id="集群水平扩展"><a href="#集群水平扩展" class="headerlink" title="集群水平扩展"></a>集群水平扩展</h1><p>假设原有集群如下:</p>
+<p><img src="https://img.zhwf.top/redis/origin-cluster.png"></p>
+<p>在原有的集群的基础上在增加一个节点(一主一从), 那么新的集群结构如下:</p>
+<p><img src="https://img.zhwf.top/redis/new-cluster.png"></p>
+<p>虚线里面的为新增的节点.</p>
+<h2 id="节点水平扩展"><a href="#节点水平扩展" class="headerlink" title="节点水平扩展"></a>节点水平扩展</h2><ol>
+<li><p>在新的一台机器上启动两个redis服务8007和8008, 配置与上面搭建redis集群配置一致</p>
+</li>
+<li><p>配置新节点的master: src/redis-cli -a zhwf123 –cluster add-node 192.168.237.137:8007 192.168.237.131:8001<br>使用add-node命令新增一个主节点8007(master)，前面的ip:port为新增节点，后面的ip:port为已知存在节点，看到日志最后有”[OK] New node added correctly”提示代表新节点加入成功</p>
+</li>
+<li><p>找到集群中的任意一个master给新增的master分配slot: src/redis-cli -a zhwf123 –cluster reshard 192.168.237.131:8001<br>输出如下：<br>… …<br>How many slots do you want to move (from 1 to 16384)? 600<br>(ps:需要多少个槽移动到新的节点上，自己设置，比如600个hash槽)<br>What is the receiving node ID? 2728a594a0498e98e4b83a537e19f9a0a3790f38<br>(ps:把这600个hash槽移动到哪个节点上去，需要指定节点id)<br>Please enter all the source node IDs.<br>Type ‘all’ to use all the nodes as source nodes for the hash slots.<br>Type ‘done’ once you entered all the source nodes IDs.<br>Source node 1:all<br>(ps:输入all为从所有主节点(8001,8002,8003)中分别抽取相应的槽数指定到新节点中，抽取的总槽数为600个)<br>… …<br>Do you want to proceed with the proposed reshard plan (yes/no)? yes<br>(ps:输入yes确认开始执行分片任务)<br>… …</p>
+</li>
+<li><p>将8008服务配置为8007的slaver</p>
+<ol>
+<li>先将8008加入到集群中: src/redis-cli -a zhwf123 –cluster add-node 192.168.237.137:8008 192.168.237.131:8001<br>此时,8008位集群中的一个主节点,并且没有分配slot</li>
+<li>将8008指定为8007服务的slaver: <ol>
+<li>登录到8008的服务: redis-cli -a zhwf123 -c -h 192.168.237.137 -p 8008</li>
+<li>指定8008为8007的slaver: cluster replicate 2728a594a0498e98e4b83a537e19f9a0a3790f38  #后面这串id为8007的节点id</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="节点删除"><a href="#节点删除" class="headerlink" title="节点删除"></a>节点删除</h2><p>删除节点使用 del-node 命令<br>如果要删除掉某个节点, 先将slaver直接删除, 再将master中的slot移动到指定的节点中, 最后将mater删除即可</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Redis/">Redis</a></div><div class="post_share"><div class="social-share" data-image="https://img.zhwf.top/redis/redis-icon.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/11/01/architecture/architecture-1-overview/"><img class="prev-cover" src="https://img.zhwf.top/architecture/cover.jpeg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">架构指什么?</div></div></a></div><div class="next-post pull-right"><a href="/2020/10/07/redis/Redis-2-data-persistence/"><img class="next-cover" src="https://img.zhwf.top/redis/redis-icon.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Redis 持久化及主从哨兵架构</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2020/10/06/redis/Redis-1-data-structure/" title="Redis 数据结构简介及安装"><img class="cover" src="https://img.zhwf.top/redis/redis-icon.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-10-06</div><div class="title">Redis 数据结构简介及安装</div></div></a></div><div><a href="/2020/10/07/redis/Redis-2-data-persistence/" title="Redis 持久化及主从哨兵架构"><img class="cover" src="https://img.zhwf.top/redis/redis-icon.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-10-07</div><div class="title">Redis 持久化及主从哨兵架构</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">锋哥</div><div class="author-info__description">个人博客</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhweif"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Redis%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text">Redis集群方案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%93%A8%E5%85%B5"><span class="toc-number">1.1.</span> <span class="toc-text">哨兵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4"><span class="toc-number">1.2.</span> <span class="toc-text">高可用集群</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="toc-number">2.</span> <span class="toc-text">高可用集群搭建</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringBoot%E6%93%8D%E4%BD%9CRedis%E9%9B%86%E7%BE%A4"><span class="toc-number">3.</span> <span class="toc-text">SpringBoot操作Redis集群</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E5%8E%9F%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">集群原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#slots%E5%AE%9A%E4%BD%8D"><span class="toc-number">4.1.</span> <span class="toc-text">slots定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%B3%E8%BD%AC%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="toc-number">4.2.</span> <span class="toc-text">跳转重定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E8%AE%AF"><span class="toc-number">4.3.</span> <span class="toc-text">Redis集群节点之间的通讯</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E4%B8%AD%E5%BC%8F"><span class="toc-number">4.3.1.</span> <span class="toc-text">集中式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gossip"><span class="toc-number">4.3.2.</span> <span class="toc-text">gossip</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%8A%96%E5%8A%A8"><span class="toc-number">4.4.</span> <span class="toc-text">网络抖动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis%E9%9B%86%E7%BE%A4%E9%80%89%E4%B8%BE"><span class="toc-number">4.5.</span> <span class="toc-text">Redis集群选举</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E8%84%91%E8%A3%82%E6%95%B0%E6%8D%AE%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98"><span class="toc-number">4.6.</span> <span class="toc-text">集群脑裂数据丢失问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E6%B0%B4%E5%B9%B3%E6%89%A9%E5%B1%95"><span class="toc-number">5.</span> <span class="toc-text">集群水平扩展</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8A%82%E7%82%B9%E6%B0%B4%E5%B9%B3%E6%89%A9%E5%B1%95"><span class="toc-number">5.1.</span> <span class="toc-text">节点水平扩展</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8A%82%E7%82%B9%E5%88%A0%E9%99%A4"><span class="toc-number">5.2.</span> <span class="toc-text">节点删除</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/12/16/spring/spring-1-overview/" title="Spring-1 Spring Framework 组成模块"><img src="https://img.zhwf.top/img-repo/sun-boat.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Spring-1 Spring Framework 组成模块"/></a><div class="content"><a class="title" href="/2021/12/16/spring/spring-1-overview/" title="Spring-1 Spring Framework 组成模块">Spring-1 Spring Framework 组成模块</a><time datetime="2021-12-16T08:44:11.000Z" title="发表于 2021-12-16 16:44:11">2021-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/04/architecture/architecture-4-principle/" title="架构设计原则"><img src="https://img.zhwf.top/architecture/cover.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="架构设计原则"/></a><div class="content"><a class="title" href="/2020/11/04/architecture/architecture-4-principle/" title="架构设计原则">架构设计原则</a><time datetime="2020-11-04T12:15:41.000Z" title="发表于 2020-11-04 20:15:41">2020-11-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/03/architecture/architecture-3-complexity-source/" title="架构设计中复杂度的来源"><img src="https://img.zhwf.top/architecture/cover.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="架构设计中复杂度的来源"/></a><div class="content"><a class="title" href="/2020/11/03/architecture/architecture-3-complexity-source/" title="架构设计中复杂度的来源">架构设计中复杂度的来源</a><time datetime="2020-11-03T12:15:41.000Z" title="发表于 2020-11-03 20:15:41">2020-11-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/02/architecture/architecture-2-perpose/" title="架构设计的意义"><img src="https://img.zhwf.top/architecture/cover.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="架构设计的意义"/></a><div class="content"><a class="title" href="/2020/11/02/architecture/architecture-2-perpose/" title="架构设计的意义">架构设计的意义</a><time datetime="2020-11-02T12:15:41.000Z" title="发表于 2020-11-02 20:15:41">2020-11-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/01/architecture/architecture-1-overview/" title="架构指什么?"><img src="https://img.zhwf.top/architecture/cover.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="架构指什么?"/></a><div class="content"><a class="title" href="/2020/11/01/architecture/architecture-1-overview/" title="架构指什么?">架构指什么?</a><time datetime="2020-11-01T01:15:41.000Z" title="发表于 2020-11-01 09:15:41">2020-11-01</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://img.zhwf.top/redis/redis.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By 锋哥</div><div class="footer_custom_text"><a target="_blank" href="https://beian.miit.gov.cn/">陇ICP备2021002744号-1</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
